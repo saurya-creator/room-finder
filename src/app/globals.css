@@ -1,0 +1,180 @@
+@import "leaflet/dist/leaflet.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-outfit: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light;
+}
+
+html.dark {
+  --background: #0b1329;
+  --foreground: #f8fafc;
+  --card-bg: #131c38;
+  --card-border: #263353;
+  color-scheme: dark;
+}
+
+html.amoled {
+  --background: #000000;
+  --foreground: #ffffff;
+  --card-bg: #09090b;
+  --card-border: #27272a;
+  color-scheme: dark;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+.amoled ::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.amoled ::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(19, 28, 56, 0.85);
+  border: 1px solid rgba(38, 51, 83, 0.8);
+}
+
+.amoled .glass-panel {
+  background: rgba(9, 9, 11, 0.9);
+  border: 1px solid rgba(39, 39, 42, 0.8);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.amoled .glass-dark {
+  background: rgba(0, 0, 0, 0.92);
+  border: 1px solid #27272a;
+}
+
+/* Leaflet Custom Marker & Popup styling */
+.custom-map-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0f172a;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  border: 2px solid #ffffff;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.dark .custom-map-pin {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+.amoled .custom-map-pin {
+  background-color: #000000;
+  border-color: #27272a;
+}
+
+.custom-map-pin:hover,
+.custom-map-pin.active {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+  transform: scale(1.12);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+  z-index: 1000 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+}
+
+.dark .leaflet-popup-content-wrapper {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.amoled .leaflet-popup-content-wrapper {
+  background: #09090b !important;
+  border-color: #27272a !important;
+  color: #ffffff !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* Heart burst animation for saving favorites */
+@keyframes heartBurst {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+.animate-heart {
+  animation: heartBurst 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
