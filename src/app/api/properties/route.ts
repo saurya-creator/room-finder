@@ -21,11 +21,14 @@ export async function GET(req: Request) {
     const foodIncluded = searchParams.get("foodIncluded") === "true";
     const noBrokerage = searchParams.get("noBrokerage") === "true";
     const sortBy = searchParams.get("sortBy") || "relevance";
+    const statusParam = searchParams.get("status");
+    const showAll = searchParams.get("all") === "true";
 
     // Prisma filter conditions
-    const where: any = {
-      status: "PUBLISHED",
-    };
+    const where: any = {};
+    if (!showAll) {
+      where.status = statusParam || "PUBLISHED";
+    }
 
     if (city) {
       where.city = { contains: city };

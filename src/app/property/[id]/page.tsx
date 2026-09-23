@@ -34,6 +34,7 @@ import { AmenityIcon } from "@/components/amenity-icon";
 import { StickyBookingWidget } from "@/components/sticky-booking-widget";
 import { InteractiveMap } from "@/components/interactive-map";
 import { Footer } from "@/components/footer";
+import { PropertyAdminActions } from "@/components/property-admin-actions";
 
 interface PropertyPageProps {
   params: {
@@ -134,6 +135,9 @@ export default async function PropertyDetailsPage({ params }: PropertyPageProps)
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
         
+        {/* Admin & Owner Edit Actions */}
+        <PropertyAdminActions property={property} />
+
         {/* Title Header */}
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">

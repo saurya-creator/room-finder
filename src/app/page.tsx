@@ -23,6 +23,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { PropertyCard } from "@/components/property-card";
 import { Footer } from "@/components/footer";
+import { getSiteSettings } from "@/lib/site-settings.server";
 import { formatCurrency } from "@/lib/utils";
 
 // Fetch featured and verified properties directly on server
@@ -123,10 +124,22 @@ const POPULAR_CITIES = [
 
 export default async function HomePage() {
   const { featuredProps, budgetProps, verifiedProps } = await getHomepageData();
+  const siteSettings = getSiteSettings();
+  const cities =
+    siteSettings.featuredCities && siteSettings.featuredCities.length > 0
+      ? siteSettings.featuredCities
+      : POPULAR_CITIES;
 
   return (
     <div className="space-y-20 pb-16">
       
+      {/* Top Announcement Bar if enabled */}
+      {siteSettings.showAnnouncement && (
+        <div className="bg-gradient-to-r from-brand-600 via-purple-600 to-indigo-600 text-white text-center py-2 px-4 text-xs font-bold tracking-wide shadow-sm">
+          <span>{siteSettings.announcementText}</span>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden">
         {/* Subtle background glow */}
@@ -137,19 +150,16 @@ export default async function HomePage() {
           {/* Trust Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-slate-900 amoled:bg-zinc-950 border border-brand-200/80 dark:border-brand-900 amoled:border-zinc-800 shadow-soft text-brand-700 dark:text-brand-300 amoled:text-brand-400 text-xs font-semibold animate-fade-in">
             <span className="flex h-2 w-2 rounded-full bg-brand-500 animate-ping" />
-            <span>Zero Brokerage • 100% Verified Property Owners</span>
+            <span>{siteSettings.heroBadge || "Zero Brokerage • 100% Verified Property Owners"}</span>
           </div>
 
           {/* Headlines */}
           <div className="space-y-4 max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-navy-950 dark:text-white amoled:text-white font-heading">
-              Find a place that <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-emerald-600 to-teal-600 dark:from-brand-400 dark:via-emerald-400 dark:to-teal-400">
-                feels like home.
-              </span>
+              {siteSettings.heroTitle}
             </h1>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 amoled:text-zinc-300 font-normal max-w-2xl mx-auto leading-relaxed">
-              Discover verified rooms, student PGs, serviced apartments, and shared stays near your college or workplace.
+              {siteSettings.heroSubtitle}
             </p>
           </div>
 
@@ -260,7 +270,7 @@ export default async function HomePage() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {POPULAR_CITIES.map((city) => (
+          {cities.map((city: any) => (
             <Link
               key={city.name}
               href={`/rooms?city=${encodeURIComponent(city.name)}`}

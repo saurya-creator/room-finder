@@ -77,18 +77,45 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const updateData: any = {};
+    if (body.title !== undefined) updateData.title = body.title;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.rentMonthly !== undefined) updateData.rentMonthly = Number(body.rentMonthly);
+    if (body.deposit !== undefined) updateData.deposit = Number(body.deposit);
+    if (body.maintenanceCharges !== undefined) updateData.maintenanceCharges = Number(body.maintenanceCharges);
+    if (body.propertyType !== undefined) updateData.propertyType = body.propertyType;
+    if (body.roomType !== undefined) updateData.roomType = body.roomType;
+    if (body.furnishing !== undefined) updateData.furnishing = body.furnishing;
+    if (body.city !== undefined) updateData.city = body.city;
+    if (body.area !== undefined) updateData.area = body.area;
+    if (body.address !== undefined) updateData.address = body.address;
+    if (body.landmark !== undefined) updateData.landmark = body.landmark;
+    if (body.latitude !== undefined) updateData.latitude = Number(body.latitude);
+    if (body.longitude !== undefined) updateData.longitude = Number(body.longitude);
+    if (body.genderPreference !== undefined) updateData.genderPreference = body.genderPreference;
+    if (body.tenantPreference !== undefined) updateData.tenantPreference = body.tenantPreference;
+    if (body.status !== undefined) updateData.status = body.status;
+    if (body.isVerified !== undefined && user.role === "ADMIN") updateData.isVerified = Boolean(body.isVerified);
+    if (body.featured !== undefined && user.role === "ADMIN") updateData.featured = Boolean(body.featured);
+    if (body.availableFrom !== undefined) updateData.availableFrom = new Date(body.availableFrom);
+
     const updated = await prisma.property.update({
       where: { id },
-      data: {
-        ...(body.status ? { status: body.status } : {}),
-        ...(body.rentMonthly ? { rentMonthly: Number(body.rentMonthly) } : {}),
-        ...(body.deposit ? { deposit: Number(body.deposit) } : {}),
-        ...(body.availableFrom ? { availableFrom: new Date(body.availableFrom) } : {}),
-        ...(body.title ? { title: body.title } : {}),
-        ...(body.description ? { description: body.description } : {}),
-        ...(body.isVerified !== undefined && user.role === "ADMIN" ? { isVerified: body.isVerified } : {}),
-      },
+      data: updateData,
     });
+
+    // If new images array provided
+    if (Array.isArray(body.images) && body.images.length > 0) {
+      await prisma.propertyImage.deleteMany({ where: { propertyId: id } });
+      await prisma.propertyImage.createMany({
+        data: body.images.map((img: any, idx: number) => ({
+          propertyId: id,
+          url: typeof img === "string" ? img : img.url,
+          isCover: idx === 0,
+          displayOrder: idx,
+        })),
+      });
+    }
 
     return NextResponse.json({ success: true, property: updated });
   } catch (err: any) {

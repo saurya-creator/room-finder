@@ -23,6 +23,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { AmenityIcon } from "@/components/amenity-icon";
 import { Footer } from "@/components/footer";
+import { GooglePlacesInput, PlaceResult } from "@/components/google-places-input";
 
 const AMENITY_CHOICES = [
   { key: "wifi", name: "High-Speed Wi-Fi", category: "Essentials" },
@@ -298,8 +299,37 @@ export default function NewPropertyWizard() {
                   Property Location
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Help prospective tenants find your room easily.
+                  Search on Google Maps to auto-fill address and coordinates, or enter manually.
                 </p>
+              </div>
+
+              {/* Google Places Autocomplete */}
+              <div className="p-4 rounded-2xl bg-brand-50/70 dark:bg-slate-800/50 border border-brand-100 dark:border-slate-700 space-y-2">
+                <label className="block text-xs font-bold text-brand-900 dark:text-brand-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-brand-600" />
+                  Quick Search with Google Maps Places
+                </label>
+                <GooglePlacesInput
+                  placeholder="Search locality, landmark, or address (e.g. Civil Lines Prayagraj)..."
+                  onPlaceSelect={(place: PlaceResult) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      city: place.city || prev.city,
+                      area: place.area || prev.area,
+                      state: place.state || prev.state,
+                      address: place.formattedAddress || prev.address,
+                      landmark: place.name && place.name !== place.formattedAddress ? place.name : prev.landmark,
+                      latitude: place.latitude,
+                      longitude: place.longitude,
+                    }));
+                  }}
+                />
+                <div className="flex items-center justify-between text-[11px] text-brand-700 dark:text-brand-400 pt-1">
+                  <span>Pinpoints exact GPS coordinates for tenant room search</span>
+                  <span className="font-mono font-semibold">
+                    📍 {formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)}
+                  </span>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

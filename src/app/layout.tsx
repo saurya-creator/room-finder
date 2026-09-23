@@ -3,6 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { MobileNav } from "@/components/mobile-nav";
 import { RoleSwitcherBanner } from "@/components/role-switcher-banner";
+import { AdminFloatingBar } from "@/components/admin-floating-bar";
 
 export const metadata: Metadata = {
   title: "UrbanNest | Find a Place That Feels Like Home",
@@ -67,6 +68,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-[var(--background)] text-[var(--foreground)] dark:bg-slate-950 dark:text-slate-100 amoled:bg-black amoled:text-white transition-colors duration-200 pb-16 md:pb-0">
         <ThemeProvider>
           <Navbar />
+          <AdminFloatingBar />
           <main className="flex-1">{children}</main>
           <MobileNav />
           <RoleSwitcherBanner />

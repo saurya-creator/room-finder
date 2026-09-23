@@ -46,7 +46,11 @@ export default function LoginPage() {
 
   const handleQuickFill = (demoEmail: string, role: string) => {
     setEmail(demoEmail);
-    setPassword(role === "ADMIN" ? "admin123" : "password123");
+    if (role === "ADMIN") {
+      setPassword("sv#223221");
+    } else {
+      setPassword("password123");
+    }
   };
 
   return (
@@ -80,7 +84,7 @@ export default function LoginPage() {
         {/* 1-Click Quick Demo Selectors */}
         <div className="space-y-2">
           <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">
-            One-Click Demo Accounts
+            One-Click Account Switcher
           </span>
           <div className="grid grid-cols-3 gap-2 text-xs">
             <button
@@ -101,11 +105,11 @@ export default function LoginPage() {
             </button>
             <button
               type="button"
-              onClick={() => handleQuickFill("admin@urbannest.com", "ADMIN")}
-              className="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-center transition-colors"
+              onClick={() => handleQuickFill("hackdark590@gmail.com", "ADMIN")}
+              className="p-2 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-800 text-center transition-colors font-bold shadow-sm"
             >
               <ShieldCheck className="w-4 h-4 mx-auto mb-1 text-purple-600" />
-              <span className="font-bold block text-[11px]">Admin</span>
+              <span className="block text-[11px]">Site Owner</span>
             </button>
           </div>
         </div>

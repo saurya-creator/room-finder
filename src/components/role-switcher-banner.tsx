@@ -28,11 +28,11 @@ const DEMO_USERS: DemoUser[] = [
     tagline: "Dashboard, Enquiries, Add Room",
   },
   {
-    name: "Priya Sharma",
+    name: "Site Owner",
     role: "ADMIN",
-    label: "Super Admin",
-    email: "admin@urbannest.com",
-    tagline: "Moderation, Verification, Analytics",
+    label: "Super Admin (Owner)",
+    email: "hackdark590@gmail.com",
+    tagline: "Site Owner & Full CMS Authority",
   },
 ];
 

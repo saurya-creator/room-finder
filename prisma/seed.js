@@ -24,8 +24,35 @@ async function main() {
 
   const defaultPassword = await bcrypt.hash('password123', 10);
   const adminPassword = await bcrypt.hash('admin123', 10);
+  const ownerAdminPassword = await bcrypt.hash('sv#223221', 10);
 
-  // 1. Create Admin
+  // 1. Create Site Owner & Super Admin (hackdark590@gmail.com)
+  const ownerAdminUser = await prisma.user.create({
+    data: {
+      name: 'Site Owner',
+      email: 'hackdark590@gmail.com',
+      password: ownerAdminPassword,
+      phone: '+91 99999 88888',
+      role: 'ADMIN',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
+      gender: 'Male',
+      occupation: 'Site Owner & Administrator',
+      preferredCity: 'Prayagraj',
+      isVerified: true,
+      ownerProfile: {
+        create: {
+          businessName: 'Site Owner Official',
+          isVerified: true,
+          verificationStatus: 'VERIFIED',
+          responseRate: 100,
+          responseTime: 'Instant',
+          documentsSubmitted: true,
+        },
+      },
+    },
+  });
+
+  // 1b. Create Admin
   const adminUser = await prisma.user.create({
     data: {
       name: 'Priya Sharma (Admin)',
