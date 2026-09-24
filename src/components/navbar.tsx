@@ -36,15 +36,22 @@ export function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
-    // Load current session
-    fetch("/api/auth/me")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.user) {
-          setUser(data.user);
-        }
-      })
-      .catch(() => {});
+    const loadSession = () => {
+      fetch("/api/auth/me", { cache: "no-store" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.user) {
+            setUser(data.user);
+          } else {
+            setUser(null);
+          }
+        })
+        .catch(() => {});
+    };
+
+    loadSession();
+    window.addEventListener("auth-changed", loadSession);
+    return () => window.removeEventListener("auth-changed", loadSession);
   }, [pathname]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {

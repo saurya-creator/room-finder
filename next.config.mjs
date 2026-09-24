@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  outputFileTracingIncludes: {
+    '/**': [
+      './prisma/dev.db',
+      './prisma/site-settings.json',
+      './prisma/schema.prisma',
+    ],
+  },
   images: {
     remotePatterns: [
       {

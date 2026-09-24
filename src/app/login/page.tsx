@@ -29,27 +29,46 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
+      window.dispatchEvent(new Event("auth-changed"));
+
+      let target = "/dashboard";
       if (data.user.role === "ADMIN") {
-        router.push("/admin");
+        target = "/admin";
       } else if (data.user.role === "OWNER") {
-        router.push("/owner/dashboard");
-      } else {
-        router.push("/dashboard");
+        target = "/owner/dashboard";
       }
-      router.refresh();
+      window.location.href = target;
     } catch (err: any) {
       setError(err.message || "Failed to sign in");
-    } finally {
       setLoading(false);
     }
   };
 
-  const handleQuickFill = (demoEmail: string, role: string) => {
+  const handleQuickLogin = async (demoEmail: string, role: string) => {
     setEmail(demoEmail);
-    if (role === "ADMIN") {
-      setPassword("sv#223221");
-    } else {
-      setPassword("password123");
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/auth/switch-demo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: demoEmail, role }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to switch role");
+      }
+
+      window.dispatchEvent(new Event("auth-changed"));
+
+      let target = "/dashboard";
+      if (role === "ADMIN") target = "/admin";
+      else if (role === "OWNER") target = "/owner/dashboard";
+      window.location.href = target;
+    } catch (err: any) {
+      setError(err.message || "Failed to sign in");
+      setLoading(false);
     }
   };
 
@@ -84,29 +103,35 @@ export default function LoginPage() {
         {/* 1-Click Quick Demo Selectors */}
         <div className="space-y-2">
           <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">
-            One-Click Account Switcher
+            Instant Demo Sign-In (1-Click)
           </span>
           <div className="grid grid-cols-3 gap-2 text-xs">
             <button
               type="button"
-              onClick={() => handleQuickFill("rahul.sharma@example.com", "USER")}
-              className="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-center transition-colors"
+              disabled={loading}
+              onClick={() => handleQuickLogin("rahul.sharma@example.com", "USER")}
+              className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-center transition-all hover:scale-102 hover:border-brand-300 disabled:opacity-50"
+              title="Sign in immediately as Rahul Sharma (Tenant)"
             >
               <User className="w-4 h-4 mx-auto mb-1 text-brand-600" />
               <span className="font-bold block text-[11px]">Tenant</span>
             </button>
             <button
               type="button"
-              onClick={() => handleQuickFill("rajesh.mehra@example.com", "OWNER")}
-              className="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-center transition-colors"
+              disabled={loading}
+              onClick={() => handleQuickLogin("rajesh.mehra@example.com", "OWNER")}
+              className="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-center transition-all hover:scale-102 hover:border-amber-300 disabled:opacity-50"
+              title="Sign in immediately as Rajesh Mehra (Owner)"
             >
               <Home className="w-4 h-4 mx-auto mb-1 text-amber-600" />
               <span className="font-bold block text-[11px]">Owner</span>
             </button>
             <button
               type="button"
-              onClick={() => handleQuickFill("hackdark590@gmail.com", "ADMIN")}
-              className="p-2 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-800 text-center transition-colors font-bold shadow-sm"
+              disabled={loading}
+              onClick={() => handleQuickLogin("hackdark590@gmail.com", "ADMIN")}
+              className="p-2.5 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-800 text-center transition-all hover:scale-102 hover:border-purple-300 font-bold shadow-sm disabled:opacity-50"
+              title="Sign in immediately as Site Owner (Super Admin)"
             >
               <ShieldCheck className="w-4 h-4 mx-auto mb-1 text-purple-600" />
               <span className="block text-[11px]">Site Owner</span>

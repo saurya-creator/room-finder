@@ -22,7 +22,7 @@ export function AdminFloatingBar() {
   const router = useRouter();
 
   const checkUserRole = () => {
-    fetch("/api/auth/me")
+    fetch("/api/auth/me", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         setIsAdmin(data?.user?.role === "ADMIN");
@@ -32,6 +32,8 @@ export function AdminFloatingBar() {
 
   useEffect(() => {
     checkUserRole();
+    window.addEventListener("auth-changed", checkUserRole);
+    return () => window.removeEventListener("auth-changed", checkUserRole);
   }, [pathname]);
 
   const handleClaimAdmin = async () => {
@@ -39,7 +41,8 @@ export function AdminFloatingBar() {
       const res = await fetch("/api/admin/claim-admin", { method: "POST" });
       if (res.ok) {
         setIsAdmin(true);
-        router.refresh();
+        window.dispatchEvent(new Event("auth-changed"));
+        window.location.reload();
       }
     } catch (err) {
       console.error("Failed to claim admin", err);
