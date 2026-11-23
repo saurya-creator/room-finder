@@ -34,8 +34,8 @@ export function InteractiveMap({
   const leafletMapRef = useRef<any>(null);
   const leafletMarkersRef = useRef<Record<string, any>>({});
 
-  // Preferred engine; falls back automatically if Google Maps auth fails
-  const [mapEngine, setMapEngine] = useState<"google" | "leaflet">("google");
+  // Preferred engine; Leaflet (OpenStreetMap) is default for 100% reliable free rendering without API key or billing blocks
+  const [mapEngine, setMapEngine] = useState<"google" | "leaflet">("leaflet");
   const [authError, setAuthError] = useState<string | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<PropertyItem | null>(null);
   const [mapType, setMapType] = useState<"roadmap" | "satellite">("roadmap");
@@ -87,7 +87,10 @@ export function InteractiveMap({
         leafletMapRef.current = null;
         leafletMarkersRef.current = {};
       }
-      container.innerHTML = "";
+      if (container) {
+        (container as any)._leaflet_id = null;
+        container.innerHTML = "";
+      }
 
       loadGoogleMaps(GOOGLE_MAPS_API_KEY)
         .then((google) => {
@@ -215,10 +218,33 @@ export function InteractiveMap({
         googleMapRef.current = null;
         overlaysRef.current = [];
       }
-      container.innerHTML = "";
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
+        leafletMarkersRef.current = {};
+      }
+      if (container) {
+        (container as any)._leaflet_id = null;
+        container.innerHTML = "";
+      }
 
-      import("leaflet").then((L) => {
+      // Ensure Leaflet CSS is injected in head
+      if (typeof document !== "undefined" && !document.getElementById("leaflet-css-bundle")) {
+        const link = document.createElement("link");
+        link.id = "leaflet-css-bundle";
+        link.rel = "stylesheet";
+        link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+        document.head.appendChild(link);
+      }
+
+      import("leaflet").then((leafletModule) => {
         if (!isMounted || !mapContainerRef.current) return;
+
+        const L = (leafletModule as any).default || leafletModule;
+
+        if ((mapContainerRef.current as any)._leaflet_id) {
+          (mapContainerRef.current as any)._leaflet_id = null;
+        }
 
         const map = L.map(mapContainerRef.current, {
           center: initialCenter,
@@ -226,19 +252,28 @@ export function InteractiveMap({
           zoomControl: false,
         });
 
-        // Crisp OpenStreetMap / Carto tiles
-        const tileUrl = isDarkMode
-          ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
-
-        L.tileLayer(tileUrl, {
-          attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
+        // Use official, fast, globally reliable OpenStreetMap tiles
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           maxZoom: 19,
+          subdomains: ["a", "b", "c"],
         }).addTo(map);
 
         L.control.zoom({ position: "topright" }).addTo(map);
         leafletMapRef.current = map;
         leafletMarkersRef.current = {};
+
+        // Invalidate map size so responsive layouts render all tiles without grey blanks
+        setTimeout(() => {
+          if (map && isMounted) {
+            map.invalidateSize();
+          }
+        }, 100);
+        setTimeout(() => {
+          if (map && isMounted) {
+            map.invalidateSize();
+          }
+        }, 500);
 
         if (!properties || properties.length === 0) return;
 
@@ -281,6 +316,14 @@ export function InteractiveMap({
 
     return () => {
       isMounted = false;
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
+        leafletMarkersRef.current = {};
+      }
+      if (mapContainerRef.current) {
+        (mapContainerRef.current as any)._leaflet_id = null;
+      }
     };
   }, [properties, mapEngine, authError]);
 
@@ -366,8 +409,8 @@ export function InteractiveMap({
         )}
       </div>
 
-      {/* Auth Warning Notice with Google Cloud Console instructions */}
-      {authError && (
+      {/* Auth Warning Notice with Google Cloud Console instructions - only show when Google Maps is chosen */}
+      {authError && mapEngine === "google" && (
         <div className="absolute top-14 left-3 right-3 sm:right-auto sm:max-w-md z-10 bg-amber-500/95 text-white backdrop-blur-md px-3.5 py-2.5 rounded-2xl shadow-lg border border-amber-400 text-xs flex items-start gap-2.5 animate-fade-in">
           <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
           <div className="flex-1">
