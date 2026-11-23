@@ -150,7 +150,7 @@ export function Footer() {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
           <p>© {new Date().getFullYear()} UrbanNest Technologies Pvt. Ltd. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <span>Made with care for tenants and owners across India</span>
+            <span>Made by Saurabh Sharma UU student</span>
             <span>INR (₹)</span>
           </div>
         </div>
